@@ -24,7 +24,7 @@ model User {
   updatedAt DateTime   @updatedAt
 
   // Relations
-  Verification Verification? @relation(name: "UserVefication")
+  Verification Verification? @relation(name: "UserVerification")
 
   @@unique([email])
   @@map("users")
@@ -52,7 +52,7 @@ model UserActivity {
 model Verification {
   id          String   @id @default(uuid())
   userId      String   @db.Uuid
-  User        User     @relation(fields: [userId], references: [id], name: "UserVefication")
+  User        User     @relation(fields: [userId], references: [id], name: "UserVerification")
   token       String   @db.Text
   generatedAt DateTime @default(now())
 
