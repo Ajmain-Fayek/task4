@@ -4,6 +4,35 @@ import { AppError } from "../../../lib/appError";
 import { generateVerificationToken, sendEmail } from "./auth.utils";
 
 //----------------------------------------
+//            Login User               //
+//----------------------------------------
+export const loginUser = async (email: string, password: string) => {
+    const user = await prisma.user.findUnique({ where: { email } });
+
+    if (!user) {
+        throw new AppError("User not found", 404);
+    }
+
+    const isPasswordMatched = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordMatched) {
+        throw new AppError("Wrong password", 401);
+    }
+
+    return {
+        success: true,
+        message: "logged in successful",
+        data: {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            status: user.status,
+            role: user.role,
+        },
+    };
+};
+
+//----------------------------------------
 //            Verify User               //
 //----------------------------------------
 export const verifyUser = async (id: string, token: string) => {

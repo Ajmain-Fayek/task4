@@ -1,10 +1,22 @@
 import { NextFunction, Request, Response } from "express";
-import { registerUser, verifyUser } from "./auth.service";
+import { loginUser, registerUser, verifyUser } from "./auth.service";
 import { AppError } from "../../../lib/appError";
 
 // Login
 const login = async (req: Request, res: Response, next: NextFunction) => {
-    res.send("login");
+    try {
+        const { email, password } = req.body;
+
+        if (!email || !password) {
+            throw new AppError("Email and Password required", 400);
+        }
+
+        const result = await loginUser(email, password);
+
+        res.status(200).json(result);
+    } catch (err) {
+        next(err);
+    }
 };
 
 // Register
