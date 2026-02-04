@@ -15,11 +15,11 @@ const transporter = nodemailer.createTransport({
     },
 });
 
-export const sendEmail = async (name: string, email: string, token: string) => {
+export const sendEmail = async (id: string, name: string, email: string, token: string) => {
     return await transporter.sendMail({
         from: '"Task4" <task4@ilearning.com>',
         to: `${email}`,
         subject: "Verify account for Task4",
-        html: `<h1>Hello! ${name}</h1>\n<p>To verify your account for <strong>Task 4</strong> click the following link:</p>\n<a href="#" target="_blank">${token}</a>`,
+        html: `<h1>Hello! ${name}</h1>\n<p>To verify your account for <strong>Task 4</strong> click the following link:</p>\n<a href="${process.env.BACKEND_BASE_URL}/auth/verify?id=${id}&token=${token}" target="_blank">${process.env.BACKEND_BASE_URL}/auth/verify?id=${id}&token=${token}</a>`,
     });
 };

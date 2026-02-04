@@ -3,9 +3,38 @@ import { prisma } from "../../../lib/prisma";
 import { AppError } from "../../../lib/appError";
 import { generateVerificationToken, sendEmail } from "./auth.utils";
 
+//----------------------------------------
+//            Verify User               //
+//----------------------------------------
+export const verifyUser = async (id: string, token: string) => {
+    const isTokenMatch = await prisma.verification.findUnique({ where: { userId: id } });
+
+    if (isTokenMatch?.token !== token) {
+        throw new AppError("Invalide user id or token", 401);
+    }
+
+    await prisma.user
+        .update({
+            where: { id: id },
+            data: {
+                status: "ACTIVE",
+            },
+        })
+        .then(async () => {
+            await prisma.verification.delete({ where: { userId: id } });
+        });
+
+    return {
+        success: true,
+        message: "Account verified successfully",
+    };
+};
+
+//----------------------------------------
+//          Register User               //
+//----------------------------------------
 const SALT_ROUND = Number(process.env.SALT_ROUND) || 10;
 
-// Register
 export const registerUser = async (name: string, email: string, password: string) => {
     const isExists = await prisma.user.findUnique({ where: { email } });
 
@@ -43,7 +72,7 @@ export const registerUser = async (name: string, email: string, password: string
     });
 
     // Send verification email
-    await sendEmail(name, email, token);
+    await sendEmail(result.id, name, email, token);
 
     // Return safe response
     return {

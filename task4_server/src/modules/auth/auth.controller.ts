@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { registerUser } from "./auth.service";
+import { registerUser, verifyUser } from "./auth.service";
 import { AppError } from "../../../lib/appError";
 
 // Login
@@ -17,15 +17,28 @@ const register = async (req: Request, res: Response, next: NextFunction) => {
         }
 
         const result = await registerUser(payload.name, payload.email, payload.password);
-        res.status(201).json({ ...result });
+
+        res.status(201).json(result);
     } catch (err) {
         next(err);
     }
 };
 
 // Verify user
-const verify = async (req: Request, res: Response) => {
-    res.send("verify");
+const verify = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { id, token } = req.query;
+
+        if (!id || !token) {
+            throw new AppError("id or token missing", 400);
+        }
+
+        const result = await verifyUser(id as string, token as string);
+
+        res.status(200).json(result);
+    } catch (err) {
+        next(err);
+    }
 };
 
 export const authController = {
