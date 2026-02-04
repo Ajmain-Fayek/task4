@@ -3,7 +3,8 @@ import { userController } from "./user.controller";
 
 const router = Router();
 
-router.get("/", userController.usersData);
-
+router.get("/", userController.getUsers);
+router.put("/", userController.updateUsers);
+router.delete("/", userController.deleteUsers);
 
 export const userRouter = router;
